@@ -119,8 +119,9 @@ class V2Manager:
                         logging.info("Successfully add user {}".format(user.prefixed_id))
 
         for prefixed_id in successfully_removed:
-            self.users.pop(prefixed_id)
+            user = self.users.pop(prefixed_id)
             self.users_to_be_removed.pop(prefixed_id)
+            self.current_traffic.pop(user.email,None)
         for prefixed_id in successfully_add:
             self.users[prefixed_id] = self.users_to_be_add.pop(prefixed_id)
 
