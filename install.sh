@@ -194,7 +194,7 @@ pre_install_caddy(){
     # Set Caddy v2ray listen port
     echo "caddy v2ray local listen port"
     read -p "(Default path: 10550):" v2ray_local_port
-    [ -z "${v2ray_path}" ] && v2ray_local_port=10550
+    [ -z "${v2ray_local_port}" ] && v2ray_local_port=10550
     echo
     echo "---------------------------"
     echo "v2ray_local_port = ${v2ray_local_port}"
