@@ -100,8 +100,10 @@ class Munager(object):
                 download_dif = current_download
                 data.append({'u': upload_dif, 'd': download_dif, 'user_id': user.user_id})
                 if current_download+current_upload>1024:
-                    for ip in self.manager.client.get_user_aliveips(user.email):
-                        ips.append({'ip': ip, 'user_id': user.user_id})
+                    user_ips = self.manager.client.get_user_aliveips(user.email)
+                    if user_ips:
+                        for ip in user_ips:
+                            ips.append({'ip': ip, 'user_id': user.user_id})
         if self.mu_api.upload_throughput(data):
             self.logger.info("Successfully upload {} users traffics".format(len(data)))
             del data
