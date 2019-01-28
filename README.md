@@ -295,7 +295,7 @@ docker run -d --network=host --name v2ray_v3_api -e node_id=1 -e key=ixidnf -e s
 **安装 v2ray：**
 
 ~~~
-bash <(curl -L -s https://install.direct/go.sh)
+curl -L -o /tmp/go.sh https://raw.githubusercontent.com/rico93/v2ray-core/master/release/install-release.sh && bash /tmp/go.sh -f --version 4.12.0
 ~~~
 
 **安装依赖：**
