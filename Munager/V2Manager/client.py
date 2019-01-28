@@ -29,7 +29,7 @@ from v2ray.com.core.transport.internet.headers.noop import config_pb2 as header_
 from v2ray.com.core.common.net.network_pb2 import TCP,UDP
 import uuid
 import grpc
-
+import ipaddress
 KCP_HEADERS_CONFIG = {"wechat-video": header_wechat_config_pb2.VideoConfig(), "srtp": header_srtp_config_pb2.Config(),
                       'utp': header_utp_config_pb2.Config(),
                       'wireguard': header_wiregurad_config_pb2.WireguardConfig(),
@@ -185,7 +185,7 @@ class Client(object):
         logging.info("Server API address {}:{}".format(address, port))
         self._channel = grpc.insecure_channel("{}:{}".format(address, port))
 
-    def get_user_traffic_downlink(self, email, reset=False):
+    def get_user_traffic_downlink(self, email, reset=True):
         """
         获取用户下行流量，单位：字节
         若该email未产生流量或email有误，返回None
@@ -201,7 +201,7 @@ class Client(object):
         except grpc.RpcError:
             return None
 
-    def get_user_traffic_uplink(self, email, reset=False):
+    def get_user_traffic_uplink(self, email, reset=True):
         """
         获取用户上行流量，单位：字节
         若该email未产生流量或email有误，返回None
@@ -216,7 +216,29 @@ class Client(object):
             )).stat.value
         except grpc.RpcError:
             return None
-
+    def get_user_aliveips(self, email, reset=False):
+        """
+        获取用户在线ip list，如果没有则返回None
+        :param email: 邮箱
+        :param reset: 是否重置计数器
+        """
+        stub = stats_command_pb2_grpc.StatsServiceStub(self._channel)
+        try:
+            raw_ips = stub.GetStats(stats_command_pb2.GetStatsRequest(
+                name="user>>>{}>>>traffic>>>ips".format(email),
+                reset=reset
+            )).stat.name
+            temp_ips = raw_ips.strip().split(";")[1:]
+            correct_ips =[]
+            for ip in temp_ips:
+                try:
+                    ipaddress.ip_address(ip)
+                    correct_ips.append(ip)
+                except ValueError:
+                    continue
+            return correct_ips
+        except grpc.RpcError:
+            return None
     def add_user(self, inbound_tag, user_id, email, level=0, alter_id=16):
         """
         在一个传入连接中添加一个用户（仅支持 VMess）
@@ -366,3 +388,4 @@ if __name__ == '__main__':
         # client.add_inbound(tag="SS_"+data['email'],address="0.0.0.0",port=1234,proxy=ss)
         client.remove_inbound(tag="SS_" + data['email'])
         print(ss)
+

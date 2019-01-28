@@ -15,7 +15,6 @@ class V2Manager:
         self.next_node_info = next_node_info
         self.if_user_change = False
         self.logger.info('Manager initializing.')
-        self.current_traffic = {}
         self.INBOUND_TAG = "MAIN_INBOUND"
         self.users_to_be_removed = {}
         self.users_to_be_add = {}
@@ -119,9 +118,8 @@ class V2Manager:
                         logging.info("Successfully add user {}".format(user.prefixed_id))
 
         for prefixed_id in successfully_removed:
-            user = self.users.pop(prefixed_id)
+            self.users.pop(prefixed_id)
             self.users_to_be_removed.pop(prefixed_id)
-            self.current_traffic.pop(user.email,None)
         for prefixed_id in successfully_add:
             self.users[prefixed_id] = self.users_to_be_add.pop(prefixed_id)
 
@@ -200,15 +198,6 @@ class V2Manager:
         else:
             logging.info("No main Inbound currently! ")
 
-    def set_current_traffic(self, user, upload, download):
-        self.current_traffic[user.email] = (upload, download)
-
-    def get_last_traffic(self, user):
-        if user.email in self.current_traffic:
-            return self.current_traffic[user.email][0], self.current_traffic[user.email][1], user.user_id
-        else:
-            return 0, 0, user.user_id
-
     def restart(self):
         self.logger.info("Restart V2ray Service")
         service_name = ["v2ray", "nginx", "httpd", "apache2"]
@@ -228,3 +217,4 @@ class V2Manager:
             self.logger.info("v2ray running !!!")
         else:
             self.logger.warning("There is something wrong, v2ray didn't run service")
+

@@ -82,8 +82,8 @@ class Munager(object):
     def upload_throughput(self):
         current_user = self.manager.get_users()
         data = []
+        ips = []
         for prefixed, user in current_user.items():
-            laset_traffic_upload,laset_traffic_download,user_id= self.manager.get_last_traffic(user)
             current_upload,current_download = self.manager.client.get_user_traffic_uplink(user.email),\
                                             self.manager.client.get_user_traffic_downlink(user.email)
             if current_download is None:
@@ -95,25 +95,23 @@ class Munager(object):
             else:
                 current_upload = int(current_upload)
 
-            if current_download+current_upload < laset_traffic_upload+laset_traffic_download:
-                self.logger.warning('error throughput, try fix.')
-                self.manager.set_current_traffic(user, upload=current_upload,download=current_download)
-            elif current_download+current_upload > laset_traffic_upload+laset_traffic_download:
-                upload_dif = current_upload - laset_traffic_upload
-                download_dif = current_download - laset_traffic_download
-                data.append({'u': upload_dif, 'd': download_dif, 'user_id': user_id,"user":user,"current_upload":current_upload,"current_download":current_download})
-        upload_data = []
-        for item in data:
-                upload_data.append({'u': item['u'], 'd': item['d'], 'user_id': item['user_id']})
-        if self.mu_api.upload_throughput(upload_data):
-            for item in data:
-                user = item['user']
-                self.manager.set_current_traffic(user, upload=item['current_upload'],download=item['current_download'])
+            if current_download+current_upload >0:
+                upload_dif = current_upload
+                download_dif = current_download
+                data.append({'u': upload_dif, 'd': download_dif, 'user_id': user.user_id})
+                if current_download+current_upload>1024:
+                    for ip in self.manager.client.get_user_aliveips(user.email):
+                        ips.append({'ip': ip, 'user_id': user.user_id})
+        if self.mu_api.upload_throughput(data):
             self.logger.info("Successfully upload {} users traffics".format(len(data)))
-            del upload_data
             del data
         else:
-            self.logger.info('update trafic faileds')
+            self.logger.info('update trafic failed')
+        if self.mu_api.upload_online_ips(ips):
+            self.logger.info("Successfully upload {} ips".format(len(ips)))
+            del ips
+        else:
+            self.logger.info('update online ips failed')
 
         self.mu_api.upload_systemload()
 
@@ -171,4 +169,5 @@ class Munager(object):
         global db_instance
         db_instance.has_stopped = True
         db_instance.event.set()
+
 

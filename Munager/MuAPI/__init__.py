@@ -65,6 +65,14 @@ class MuAPI:
         except:
             return False
 
+    def upload_online_ips(self, data):
+        try:
+            self.webapi.postApi('users/aliveip',
+                       {'node_id': self.node_id},
+                       {'data': data})
+            return True
+        except:
+            return False
     def upload_systemload(self):
         uptime = self.uptime()
         load = self.load()
@@ -122,3 +130,4 @@ class MuAPI:
         import os
         return os.popen(
             "cat /proc/loadavg | awk '{ print $1\" \"$2\" \"$3 }'").readlines()[0]
+
