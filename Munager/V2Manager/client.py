@@ -216,7 +216,7 @@ class Client(object):
             )).stat.value
         except grpc.RpcError:
             return None
-    def get_user_aliveips(self, email, reset=False):
+    def get_user_aliveips(self, email, reset=True):
         """
         获取用户在线ip list，如果没有则返回None
         :param email: 邮箱
