@@ -1,3 +1,5 @@
+# 不在维护，请更新到go版本
+使用docker-compose的大家，把docker-compose.yml里面api_alpine替换成go就好了
 # 划重点
 1. 用户务必保证，他的邮箱是正确邮箱格式(否则无法加入v2后端，host 务必填写没有被墙的地址）
 2. 感谢NimaQu的[ss repo](https://github.com/NimaQu/shadowsocks)， 目前基本架构在他的基础上改了一个v2的中间件版本出来。（应该speedtest不会造成节点面板下线了）
