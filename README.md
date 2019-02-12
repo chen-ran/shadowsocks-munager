@@ -1,4 +1,4 @@
-# 不在维护，请更新到go版本
+# 不再维护，请更新到![Go版本](https://github.com/rico93/v2ray-sspanel-v3-mod_Uim-plugin/)
 使用docker-compose的大家，把docker-compose.yml里面api_alpine替换成go就好了
 # 划重点
 1. 用户务必保证，他的邮箱是正确邮箱格式(否则无法加入v2后端，host 务必填写没有被墙的地址）
